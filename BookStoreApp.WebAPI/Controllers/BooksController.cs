@@ -91,7 +91,15 @@ namespace BookStoreApp.WebAPI.Controllers
         [HttpPatch("{id:int}")]
         public IActionResult PartiallyUpdateOneBook([FromRoute(Name ="id")]int id, JsonPatchDocument<Book> bookPatch)
         {
+            //check Entity ?
+            var entity = ApplicationContext.Books.Where(x => x.Id.Equals(id)).FirstOrDefault();
+            if (entity == null)
+                return NotFound();
 
+            // parametre olarak gelen yamayı mevcut entity'e yansıtalım.
+
+            bookPatch.ApplyTo(entity);
+            return NoContent();
         }
 
     }
