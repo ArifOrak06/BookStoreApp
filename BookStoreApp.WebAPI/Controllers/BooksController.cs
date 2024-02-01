@@ -1,5 +1,6 @@
-﻿using BookStoreApp.WebAPI.Data.FakeContext;
-using BookStoreApp.WebAPI.Models;
+﻿using BookStoreApp.Core.Entities;
+using BookStoreApp.Persistence.Contexts;
+using BookStoreApp.WebAPI.Data.FakeContext;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,24 +10,39 @@ namespace BookStoreApp.WebAPI.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
+        private readonly AppDbContext _context;
+
+        public BooksController(AppDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
         public IActionResult GetAllBooks()
         {
-            var books = ApplicationContext.Books;
-            return Ok(books);
+            try
+            {
+                var books = _context.Books.ToList();
+                return Ok(books);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+           
         }
         [HttpGet("{id:int}")]
-        public IActionResult GetOneBook([FromRoute(Name ="id")] int id)
+        public IActionResult GetOneBook([FromRoute(Name = "id")] int id)
         {
-            var book  = ApplicationContext.Books
+            var book = _context.Books
                 .Where(x => x.Id.Equals(id))
                 .SingleOrDefault();
 
-            if(book is null)
+            if (book is null)
                 return NotFound(); //404
 
-            return Ok(book);    
+            return Ok(book);
         }
         [HttpPost]
         public IActionResult CreateOneBook([FromBody] Book book)
@@ -36,7 +52,8 @@ namespace BookStoreApp.WebAPI.Controllers
                 if (book is null)
                     return BadRequest();
 
-                ApplicationContext.Books.Add(book);
+                _context.Books.Add(book);
+                _context.SaveChanges();
                 return StatusCode(201, book);
             }
             catch (Exception ex)
@@ -46,60 +63,80 @@ namespace BookStoreApp.WebAPI.Controllers
             }
         }
         [HttpPut("{id:int}")]
-        public IActionResult UpdateOneBook([FromRoute(Name ="id")]int id, [FromBody]Book book)
-        {
-            var entity = ApplicationContext.Books.Find(x => x.Id.Equals(id));
-            if(entity == null)
-                return BadRequest();
-
-            if (id != book.Id)
-                return BadRequest();
-
-            ApplicationContext.Books.Remove(entity);
-            ApplicationContext.Books.Add(book);
-            return Ok(book.Id);
-        }
-        [HttpDelete("{id:int}")]
-        public IActionResult DeleteOneBook([FromRoute(Name ="id")]int id)
+        public IActionResult UpdateOneBook([FromRoute(Name = "id")] int id, [FromBody] Book book)
         {
             try
             {
-                var deletedEntity = ApplicationContext.Books.Where(x => x.Id == id).FirstOrDefault();
+                var entity = _context.Books.Where(x => x.Id.Equals(id)).SingleOrDefault();
+                if (entity == null)
+                    return BadRequest();
+
+                if (id != book.Id)
+                    return BadRequest();
+
+                entity.Title = book.Title;
+                entity.Price = book.Price;
+
+                _context.SaveChanges();
+                return StatusCode(200,book.Id);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+           
+        }
+        [HttpDelete("{id:int}")]
+        public IActionResult DeleteOneBook([FromRoute(Name = "id")] int id)
+        {
+            try
+            {
+                var deletedEntity = _context.Books.Where(x => x.Id == id).FirstOrDefault();
                 if (deletedEntity == null)
                     return NotFound(new
                     {
                         StatusCode = 404,
                         Message = $"Book with id: {id} couldn't found."
                     });
-                ApplicationContext.Books.Remove(deletedEntity);
+                _context.Books.Remove(deletedEntity);
+                _context.SaveChanges();
                 return NoContent();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
-                
+                throw new Exception(ex.Message);
+
             }
-            
-            
+
+
         }
-        [HttpDelete]
-        public IActionResult DeleteAllBooks()
-        {
-            ApplicationContext.Books.Clear();
-            return NoContent();
-        }
+     
         [HttpPatch("{id:int}")]
-        public IActionResult PartiallyUpdateOneBook([FromRoute(Name ="id")]int id, JsonPatchDocument<Book> bookPatch)
+        public IActionResult PartiallyUpdateOneBook([FromRoute(Name = "id")] int id, JsonPatchDocument<Book> bookPatch)
         {
             //check Entity ?
-            var entity = ApplicationContext.Books.Where(x => x.Id.Equals(id)).FirstOrDefault();
-            if (entity == null)
-                return NotFound();
+            try
+            {
+                var entity = _context.Books.Where(x => x.Id.Equals(id)).FirstOrDefault();
+                if (entity == null)
+                    return NotFound();
+                // parametre olarak gelen yamayı takip edilen mevcut entity'e yansıtalım.
+                bookPatch.ApplyTo(entity);
+                // daha sonra db'ye yanstıalım.
+                _context.SaveChanges();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
 
-            // parametre olarak gelen yamayı mevcut entity'e yansıtalım.
+                throw new Exception(ex.Message);
+            }
+            
 
-            bookPatch.ApplyTo(entity);
-            return NoContent();
+          
+
+          
         }
 
     }
