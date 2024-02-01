@@ -1,4 +1,4 @@
-﻿using BookStoreApp.WebAPI.Models;
+﻿using BookStoreApp.Core.Entities;
 
 namespace BookStoreApp.WebAPI.Data.FakeContext
 {
