@@ -1,4 +1,6 @@
-﻿using BookStoreApp.Persistence.Contexts;
+﻿using BookStoreApp.Core.Repositories;
+using BookStoreApp.Persistence.Contexts;
+using BookStoreApp.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,11 @@ namespace BookStoreApp.Persistence.Extensions.Microsoft
                 options.MigrationsAssembly(Assembly.GetAssembly(typeof(AppDbContext)).GetName().Name);
             });
         });
+        public static void ConfigurePersistenceRepositories(this IServiceCollection services)
+        {
+
+            services.AddScoped<IRepositoryManager,RepositoryManager>();
+        }
         
     }
 }

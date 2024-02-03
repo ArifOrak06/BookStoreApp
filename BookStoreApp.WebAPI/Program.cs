@@ -1,4 +1,9 @@
 using BookStoreApp.Persistence.Extensions.Microsoft;
+using BookStoreApp.Service.Extensions.Microsoft;
+
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,8 +15,17 @@ builder.Services.AddControllers().AddNewtonsoftJson(); // json üzerinde maniplas
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+//register of Persistence Repositories 
 builder.Services.ConfigureDbContext(builder.Configuration);
+builder.Services.ConfigurePersistenceRepositories();
+
+
+//register of Servies Layer Services
+builder.Services.ConfigureServicesForBusinesLayer();
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
