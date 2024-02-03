@@ -1,8 +1,6 @@
 using BookStoreApp.Persistence.Extensions.Microsoft;
 using BookStoreApp.Service.Extensions.Microsoft;
-
-
-
+using NLog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +21,8 @@ builder.Services.ConfigurePersistenceRepositories();
 //register of Servies Layer Services
 builder.Services.ConfigureServicesForBusinesLayer();
 
-
+// nlog configuration
+LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 
 var app = builder.Build();

@@ -22,17 +22,8 @@ namespace BookStoreApp.WebAPI.Controllers
         [HttpGet]
         public IActionResult GetAllBooks()
         {
-            try
-            {
-                var books = _serviceManager.BookService.GetAllBooks(false);
-                return Ok(books);
-            }
-            catch (Exception ex)
-            {
-
-                return BadRequest(ex.Message);
-            }
-
+            var books = _serviceManager.BookService.GetAllBooks(false);
+            return Ok(books);
         }
         [HttpGet("{id:int}")]
         public IActionResult GetOneBook([FromRoute(Name = "id")] int id)
@@ -42,13 +33,18 @@ namespace BookStoreApp.WebAPI.Controllers
         [HttpPost]
         public IActionResult CreateOneBook([FromBody] Book book)
         {
-            
+            if (book == null)
+                return BadRequest();
+
             var result = _serviceManager.BookService.CreateOneBook(book);
             return StatusCode(201, result);
         }
         [HttpPut("{id:int}")]
         public IActionResult UpdateOneBook([FromRoute(Name = "id")] int id, [FromBody] Book book)
         {
+            if (book is null)
+                return BadRequest();
+
             var result = _serviceManager.BookService.UpdateOneBook(id, book, true);
             return StatusCode(200, result);
 
@@ -58,8 +54,6 @@ namespace BookStoreApp.WebAPI.Controllers
         {
             _serviceManager.BookService.DeleteOneBook(id, false);
             return StatusCode(204);
-
-
         }
 
         [HttpPatch("{id:int}")]
@@ -69,7 +63,7 @@ namespace BookStoreApp.WebAPI.Controllers
             try
             {
                 var entity = _serviceManager.BookService.GetOneBookById(id, true);
-            
+
                 // parametre olarak gelen yamayı takip edilen mevcut entity'e yansıtalım.
                 bookPatch.ApplyTo(entity);
                 // daha sonra db'ye yanstıalım.
