@@ -1,5 +1,6 @@
 ﻿using BookStoreApp.Core.Entities;
 using BookStoreApp.Core.Repositories;
+using BookStoreApp.Core.ResponseResultPattern.Exceptions;
 using BookStoreApp.Core.Services;
 
 namespace BookStoreApp.Service.Services
@@ -26,10 +27,8 @@ namespace BookStoreApp.Service.Services
         {
             var deletedEntity = _repositoryManager.BookRepository.GetOneBookById(bookId, trackChanges);
             if (deletedEntity == null)
-            {
-                _loggerService.LogInfo($"The book with id : {bookId} could not found.");
-                throw new Exception($"Book with id : {bookId} could not found.");
-            }
+                throw new BookNotFoundException(bookId);
+            
             _repositoryManager.BookRepository.DeleteOneBook(deletedEntity);
             _repositoryManager.Save();
         }
@@ -43,11 +42,9 @@ namespace BookStoreApp.Service.Services
         {
             var currentEntity = _repositoryManager.BookRepository.GetOneBookById(bookId, trackChanges);
             if (currentEntity == null)
-            {
-                string message = $"Book with id : {bookId} could not found.";
-                _loggerService.LogInfo(message);
-                throw new Exception(message);
-            }
+                // loglama mekanizması global Exception Handler yapısı içerisinde çalıştırıldığı için burada tekrardan mekanızma çalıştırmaya gerek yok.!
+                throw new BookNotFoundException(bookId);
+            
 
             return currentEntity;
         }
@@ -56,19 +53,11 @@ namespace BookStoreApp.Service.Services
         {
             var currentEntity = _repositoryManager.BookRepository.GetOneBookById(bookId, trackChanges);
             if (currentEntity == null)
-            {
-                string logMessage = $"The book with id : {bookId} could not found.";
-                _loggerService.LogInfo(logMessage);
-                throw new Exception(logMessage);
-
-            }
+                throw new BookNotFoundException(bookId);
 
             if (bookId != book.Id)
-            {
-                string message = $"Parametre olarak gönderilen varlığa ait id bilgisi ile rotadan gönderilen id'ler eşleşmemektedir.";
-                _loggerService.LogInfo(message);
-                throw new Exception(message);
-            }
+                throw new BookNotMatchedException(bookId);
+            
 
             _repositoryManager.BookRepository.UpdateOneBook(book);
             //currentEntity.Title = book.Title;

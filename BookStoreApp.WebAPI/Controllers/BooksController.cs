@@ -60,23 +60,17 @@ namespace BookStoreApp.WebAPI.Controllers
         public IActionResult PartiallyUpdateOneBook([FromRoute(Name = "id")] int id, JsonPatchDocument<Book> bookPatch)
         {
             //check Entity ?
-            try
-            {
-                var entity = _serviceManager.BookService.GetOneBookById(id, true);
 
-                // parametre olarak gelen yamayı takip edilen mevcut entity'e yansıtalım.
-                bookPatch.ApplyTo(entity);
-                // daha sonra db'ye yanstıalım.
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(ex.Message);
-            }
+            var entity = _serviceManager.BookService.GetOneBookById(id, true);
+            if (entity == null)
+                return BadRequest();
 
 
-
+            // parametre olarak gelen yamayı takip edilen mevcut entity'e yansıtalım.
+            bookPatch.ApplyTo(entity);
+            _serviceManager.BookService.UpdateOneBook(id,entity,true);
+            // daha sonra db'ye yanstıalım.
+            return NoContent();
 
 
         }
