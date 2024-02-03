@@ -1,5 +1,7 @@
+using BookStoreApp.Core.Services;
 using BookStoreApp.Persistence.Extensions.Microsoft;
 using BookStoreApp.Service.Extensions.Microsoft;
+using BookStoreApp.WebAPI.Extensions;
 using NLog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +28,14 @@ LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nl
 
 
 var app = builder.Build();
+// Using global Exception Handler
+// uygulamayý ayaða kaldýrdýktan sonra ihtiyaç duyulan servisi aþaðýdaki gibi çaðýrabiliriz.
+
+
+var logger = app.Services.GetRequiredService<ILoggerService>();
+
+app.ConfigureExceptionHandler(logger);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -33,6 +43,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+if (app.Environment.IsProduction())
+{
+    app.UseHsts();
+}
+
+
 
 app.UseHttpsRedirection();
 
