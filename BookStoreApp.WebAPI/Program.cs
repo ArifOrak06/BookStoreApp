@@ -8,7 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddNewtonsoftJson(); // json üzerinde maniplasyon yapabilmek için.
+builder.Services.AddControllers(config =>
+{
+    config.RespectBrowserAcceptHeader = true; // API uygulamamýzý içerik pazarlýðýna açtýk.
+    config.ReturnHttpNotAcceptable = true; // Desteklemediðimiz içerik taleplerine Status code 406 Not Acceptable olarak dönüþ yapmasýný belirttik.
+}).AddXmlDataContractSerializerFormatters().AddNewtonsoftJson(); // json üzerinde maniplasyon yapabilmek için.
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
