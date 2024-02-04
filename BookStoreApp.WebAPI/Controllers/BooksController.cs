@@ -1,10 +1,5 @@
-﻿using AutoMapper;
-using BookStoreApp.Core.DTOs.Concretes.BookDTOs;
-using BookStoreApp.Core.Entities;
-using BookStoreApp.Core.Repositories;
+﻿using BookStoreApp.Core.DTOs.Concretes.BookDTOs;
 using BookStoreApp.Core.Services;
-using BookStoreApp.Persistence.Contexts;
-using BookStoreApp.WebAPI.Data.FakeContext;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
