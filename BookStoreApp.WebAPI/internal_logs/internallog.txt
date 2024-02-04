@@ -19,3 +19,7 @@
 2024-02-03 21:50:56.3500 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.2.8.2366. Product version: 5.2.8+f586f1341c46fa38aaaff4c641e7f0fa7e813943. GlobalAssemblyCache: False
 2024-02-03 21:50:56.3630 Info Validating config: TargetNames=logfile, ConfigItems=12, FilePath=C:\Users\o1tak\source\repos\BookStoreApp\BookStoreApp.WebAPI\nlog.config
 2024-02-03 21:50:56.3630 Info Configuration initialized.
+2024-02-04 15:12:45.4738 Info Registered target NLog.Targets.FileTarget(Name=logfile)
+2024-02-04 15:12:45.4922 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.2.8.2366. Product version: 5.2.8+f586f1341c46fa38aaaff4c641e7f0fa7e813943. GlobalAssemblyCache: False
+2024-02-04 15:12:45.5044 Info Validating config: TargetNames=logfile, ConfigItems=12, FilePath=C:\Users\o1tak\source\repos\BookStoreApp\BookStoreApp.WebAPI\nlog.config
+2024-02-04 15:12:45.5164 Info Configuration initialized.

@@ -1,4 +1,5 @@
-﻿using BookStoreApp.Core.Repositories;
+﻿using AutoMapper;
+using BookStoreApp.Core.Repositories;
 using BookStoreApp.Core.Services;
 
 
@@ -8,9 +9,9 @@ namespace BookStoreApp.Service.Services
     {
         private readonly Lazy<IBookService> _bookService;
         
-        public ServiceManager(IRepositoryManager repositoryManager,ILoggerService loggerService)
+        public ServiceManager(IRepositoryManager repositoryManager,ILoggerService loggerService,IMapper mapper)
         {
-            _bookService = new Lazy<IBookService>(() => new BookManager(repositoryManager,loggerService));
+            _bookService = new Lazy<IBookService>(() => new BookManager(repositoryManager,loggerService, mapper));
         }
 
         public IBookService BookService => _bookService.Value;
