@@ -1,4 +1,6 @@
-﻿using BookStoreApp.Core.Entities;
+﻿using AutoMapper;
+using BookStoreApp.Core.DTOs.Concretes.BookDTOs;
+using BookStoreApp.Core.Entities;
 using BookStoreApp.Core.Repositories;
 using BookStoreApp.Core.Services;
 using BookStoreApp.Persistence.Contexts;
@@ -13,10 +15,12 @@ namespace BookStoreApp.WebAPI.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IServiceManager _serviceManager;
+      
 
         public BooksController(IServiceManager serviceManager)
         {
             _serviceManager = serviceManager;
+      
         }
 
         [HttpGet]
@@ -31,21 +35,21 @@ namespace BookStoreApp.WebAPI.Controllers
             return Ok(_serviceManager.BookService.GetOneBookById(id, false));
         }
         [HttpPost]
-        public IActionResult CreateOneBook([FromBody] Book book)
+        public IActionResult CreateOneBook([FromBody] BookDtoForInsertion bookDtoForInsertion)
         {
-            if (book == null)
+            if (bookDtoForInsertion == null)
                 return BadRequest();
 
-            var result = _serviceManager.BookService.CreateOneBook(book);
+            var result = _serviceManager.BookService.CreateOneBook(bookDtoForInsertion);
             return StatusCode(201, result);
         }
         [HttpPut("{id:int}")]
-        public IActionResult UpdateOneBook([FromRoute(Name = "id")] int id, [FromBody] Book book)
+        public IActionResult UpdateOneBook([FromRoute(Name = "id")] int id, [FromBody] BookDtoForUpdate bookDtoForUpdate)
         {
-            if (book is null)
+            if (bookDtoForUpdate is null)
                 return BadRequest();
 
-            var result = _serviceManager.BookService.UpdateOneBook(id, book, true);
+            var result = _serviceManager.BookService.UpdateOneBook(id, bookDtoForUpdate, true);
             return StatusCode(200, result);
 
         }
@@ -57,7 +61,7 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpPatch("{id:int}")]
-        public IActionResult PartiallyUpdateOneBook([FromRoute(Name = "id")] int id, JsonPatchDocument<Book> bookPatch)
+        public IActionResult PartiallyUpdateOneBook([FromRoute(Name = "id")] int id, JsonPatchDocument<BookDto> bookDtoPatch)
         {
             //check Entity ?
 
@@ -67,8 +71,13 @@ namespace BookStoreApp.WebAPI.Controllers
 
 
             // parametre olarak gelen yamayı takip edilen mevcut entity'e yansıtalım.
-            bookPatch.ApplyTo(entity);
-            _serviceManager.BookService.UpdateOneBook(id,entity,true);
+            bookDtoPatch.ApplyTo(entity);
+            _serviceManager.BookService.UpdateOneBook(id,new BookDtoForUpdate
+            {
+                Id = entity.Id,
+                Price = entity.Price,
+                Title = entity.Title
+            },true);
             // daha sonra db'ye yanstıalım.
             return NoContent();
 

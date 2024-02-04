@@ -1,4 +1,6 @@
-﻿using BookStoreApp.Core.Entities;
+﻿using AutoMapper;
+using BookStoreApp.Core.DTOs.Concretes.BookDTOs;
+using BookStoreApp.Core.Entities;
 using BookStoreApp.Core.Repositories;
 using BookStoreApp.Core.ResponseResultPattern.Exceptions;
 using BookStoreApp.Core.Services;
@@ -9,18 +11,20 @@ namespace BookStoreApp.Service.Services
     {
         private readonly IRepositoryManager _repositoryManager;
         private readonly ILoggerService _loggerService;
+        private readonly IMapper _mapper;
 
-        public BookManager(IRepositoryManager repositoryManager, ILoggerService loggerService)
+        public BookManager(IRepositoryManager repositoryManager, ILoggerService loggerService, IMapper mapper)
         {
             _repositoryManager = repositoryManager;
             _loggerService = loggerService;
+            _mapper = mapper;
         }
 
-        public Book CreateOneBook(Book book)
+        public BookDtoForInsertion CreateOneBook(BookDtoForInsertion bookDtoForInsertion)
         {
-            _repositoryManager.BookRepository.CreateOneBook(book);
+            _repositoryManager.BookRepository.CreateOneBook(_mapper.Map<Book>(bookDtoForInsertion));
             _repositoryManager.Save();
-            return book;
+            return bookDtoForInsertion;
         }
 
         public void DeleteOneBook(int bookId, bool trackChanges)
@@ -33,12 +37,12 @@ namespace BookStoreApp.Service.Services
             _repositoryManager.Save();
         }
 
-        public IEnumerable<Book> GetAllBooks(bool trackChanges)
+        public IEnumerable<BookDto> GetAllBooks(bool trackChanges)
         {
-            return _repositoryManager.BookRepository.GetAllBooks(trackChanges);
+            return _mapper.Map<IEnumerable<BookDto>>(_repositoryManager.BookRepository.GetAllBooks(trackChanges));
         }
 
-        public Book GetOneBookById(int bookId, bool trackChanges)
+        public BookDto GetOneBookById(int bookId, bool trackChanges)
         {
             var currentEntity = _repositoryManager.BookRepository.GetOneBookById(bookId, trackChanges);
             if (currentEntity == null)
@@ -46,24 +50,21 @@ namespace BookStoreApp.Service.Services
                 throw new BookNotFoundException(bookId);
             
 
-            return currentEntity;
+            return _mapper.Map<BookDto>(currentEntity);
         }
 
-        public Book UpdateOneBook(int bookId, Book book, bool trackChanges)
+        public BookDtoForUpdate UpdateOneBook(int bookId, BookDtoForUpdate bookDtoForUpdate, bool trackChanges)
         {
             var currentEntity = _repositoryManager.BookRepository.GetOneBookById(bookId, trackChanges);
             if (currentEntity == null)
                 throw new BookNotFoundException(bookId);
 
-            if (bookId != book.Id)
+            if (bookId != bookDtoForUpdate.Id)
                 throw new BookNotMatchedException(bookId);
-            
 
-            _repositoryManager.BookRepository.UpdateOneBook(book);
-            //currentEntity.Title = book.Title;
-            //currentEntity.Price = book.Price;
+            _repositoryManager.BookRepository.UpdateOneBook(_mapper.Map<Book>(bookDtoForUpdate));
             _repositoryManager.Save();
-            return book;
+            return bookDtoForUpdate;
         }
     }
 }
