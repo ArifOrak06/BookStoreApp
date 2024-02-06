@@ -2,7 +2,7 @@
 {
     public sealed class BookNotMatchedException : NotMatchedException
     {
-        public BookNotMatchedException(int id) : base($"Parametre olarak gönderilen {id} ile Request Body içerisinde gönderilen nesne id'leri eşleşmemektedir.")
+        public BookNotMatchedException(int id) : base($"Parametre olarak gönderilen varlık id :  {id} ile Request Body içerisinde gönderilen nesne id'leri eşleşmemektedir.")
         {
         }
     }
