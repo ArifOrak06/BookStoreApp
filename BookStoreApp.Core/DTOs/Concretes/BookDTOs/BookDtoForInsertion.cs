@@ -1,8 +1,9 @@
-﻿namespace BookStoreApp.Core.DTOs.Concretes.BookDTOs
+﻿using BookStoreApp.Core.DTOs.Concretes.ValidationsForBookDTOs;
+
+namespace BookStoreApp.Core.DTOs.Concretes.BookDTOs
 {
-    public record BookDtoForInsertion
+    public record BookDtoForInsertion : BookDtoForManipulation
     {
-        public String Title { get; init; }
-        public decimal Price { get; init; }
+        
     }
 }

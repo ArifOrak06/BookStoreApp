@@ -19,60 +19,71 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllBooks()
+        public async Task<IActionResult> GetAllBooks()
         {
-            var books = _serviceManager.BookService.GetAllBooks(false);
+            var books = await _serviceManager.BookService.GetAllBooksAsync(false);
             return Ok(books);
         }
+
         [HttpGet("{id:int}")]
-        public IActionResult GetOneBook([FromRoute(Name = "id")] int id)
+        public async Task<IActionResult> GetOneBook([FromRoute(Name = "id")] int id)
         {
-            return Ok(_serviceManager.BookService.GetOneBookById(id, false));
+            return Ok(await _serviceManager.BookService.GetOneBookByIdAsync(id, false));
         }
+
         [HttpPost]
-        public IActionResult CreateOneBook([FromBody] BookDtoForInsertion bookDtoForInsertion)
+        public async Task<IActionResult> CreateOneBook([FromBody] BookDtoForInsertion bookDtoForInsertion)
         {
             if (bookDtoForInsertion == null)
                 return BadRequest();
-
-            var result = _serviceManager.BookService.CreateOneBook(bookDtoForInsertion);
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+            var result = await _serviceManager.BookService.CreateOneBookAsync(bookDtoForInsertion);
             return StatusCode(201, result);
         }
+
         [HttpPut("{id:int}")]
-        public IActionResult UpdateOneBook([FromRoute(Name = "id")] int id, [FromBody] BookDtoForUpdate bookDtoForUpdate)
+        public async Task<IActionResult> UpdateOneBook([FromRoute(Name = "id")] int id, [FromBody] BookDtoForUpdate bookDtoForUpdate)
         {
             if (bookDtoForUpdate is null)
                 return BadRequest();
-
-            var result = _serviceManager.BookService.UpdateOneBook(id, bookDtoForUpdate, true);
+            if(!ModelState.IsValid)
+                return UnprocessableEntity(ModelState); 
+            var result = await _serviceManager.BookService.UpdateOneBookAsync(id, bookDtoForUpdate, false);
             return StatusCode(200, result);
 
         }
+
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteOneBook([FromRoute(Name = "id")] int id)
+        public async Task<IActionResult> DeleteOneBook([FromRoute(Name = "id")] int id)
         {
-            _serviceManager.BookService.DeleteOneBook(id, false);
+            await _serviceManager.BookService.DeleteOneBookAsync(id, false);
             return StatusCode(204);
         }
 
         [HttpPatch("{id:int}")]
-        public IActionResult PartiallyUpdateOneBook([FromRoute(Name = "id")] int id, JsonPatchDocument<BookDto> bookDtoPatch)
+        public async Task<IActionResult> PartiallyUpdateOneBook([FromRoute(Name = "id")] int id, JsonPatchDocument<BookDtoForUpdate> bookDtoForUpdatePatch)
         {
             //check Entity ?
 
-            var entity = _serviceManager.BookService.GetOneBookById(id, true);
-            if (entity == null)
+            
+            if (bookDtoForUpdatePatch == null)
                 return BadRequest();
 
+            var result = await _serviceManager.BookService.GetOneBookForPatchAsync(id,false);
+            // parametre olarak aldığımız bookDtoForUpdatePatch yamasını bookDtoForUpdate dto nesnemize yamalayalım. :)
 
-            // parametre olarak gelen yamayı takip edilen mevcut entity'e yansıtalım.
-            bookDtoPatch.ApplyTo(entity);
-            _serviceManager.BookService.UpdateOneBook(id,new BookDtoForUpdate
-            {
-                Id = entity.Id,
-                Price = entity.Price,
-                Title = entity.Title
-            },true);
+            bookDtoForUpdatePatch.ApplyTo(result.bookDtoForUpdate,ModelState);
+
+            // Daha sonra yamadan sonraki halin geçerliliğini kontrol edelim.
+
+            TryValidateModel(result.bookDtoForUpdate);
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity();
+
+            await _serviceManager.BookService.SaveChangesForPatchAsync(result.bookDtoForUpdate, result.book);
+
             // daha sonra db'ye yanstıalım.
             return NoContent();
 

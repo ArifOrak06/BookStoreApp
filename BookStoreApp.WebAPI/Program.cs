@@ -2,6 +2,7 @@ using BookStoreApp.Core.Services;
 using BookStoreApp.Persistence.Extensions.Microsoft;
 using BookStoreApp.Service.Extensions.Microsoft;
 using BookStoreApp.WebAPI.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,12 @@ builder.Services.AddControllers(config =>
     config.RespectBrowserAcceptHeader = true; // API uygulamamýzý içerik pazarlýðýna açtýk.
     config.ReturnHttpNotAcceptable = true; // Desteklemediðimiz içerik taleplerine Status code 406 Not Acceptable olarak dönüþ yapmasýný belirttik.
 }).AddXmlDataContractSerializerFormatters().AddNewtonsoftJson(); // json üzerinde maniplasyon yapabilmek için.
+
+// Custom validation Confguring
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
