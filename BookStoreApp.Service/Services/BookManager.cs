@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookStoreApp.Core.DTOs.Concretes.BookDTOs;
 using BookStoreApp.Core.Entities;
+using BookStoreApp.Core.Entities.RequestFeatures;
 using BookStoreApp.Core.Repositories;
 using BookStoreApp.Core.ResponseResultPattern.Exceptions;
 using BookStoreApp.Core.Services;
@@ -37,9 +38,14 @@ namespace BookStoreApp.Service.Services
             await _repositoryManager.SaveAsync();
         }
 
-        public async Task<IEnumerable<BookDto>> GetAllBooksAsync(bool trackChanges)
+        public async Task<(IEnumerable<BookDto> bookDtos, MetaData metaData)> GetAllBooksAsync(BookParameters bookParameters, bool trackChanges)
         {
-            return _mapper.Map<IEnumerable<BookDto>>(await _repositoryManager.BookRepository.GetAllBooksAsync(trackChanges));
+            var booksWithMetaData =  await _repositoryManager.BookRepository.GetAllBooksAsync(bookParameters,trackChanges);
+            // daha sonra bir tupple dönmemiz gerektiği için burada da bir hatırlatma yapmamız gerekir, PagedList<Book> içerisinde hem metaData, hemde sayfalandırılmış halde List<Book> dönüyor, dolayısıyla PagedList<Book> yapısını List<Book> olarak düşünebiliriz, zaten pagedList'i hatırlarsanız List<T> koleksiyonundan inherit etmiştik.
+            // tuplle içerisinde hem IEnumerable<BookDto> ve hemde MetaData dönmemiz gerektiği için PagedList<Book>'u IEnumerable<BookDto>'ya mapleyelim.
+            var booksDto  = _mapper.Map<IEnumerable<BookDto>>(booksWithMetaData);
+            return (booksDto, booksWithMetaData.MetaData);
+
         }
 
         public async Task<BookDto> GetOneBookByIdAsync(int bookId, bool trackChanges)
@@ -86,6 +92,7 @@ namespace BookStoreApp.Service.Services
                 throw new BookNotFoundException(id);
 
             return entity;
+
         }
     }
 }
