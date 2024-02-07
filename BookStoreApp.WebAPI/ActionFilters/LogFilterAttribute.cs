@@ -23,8 +23,8 @@ namespace BookStoreApp.WebAPI.ActionFilters
             var logDetails = new LogDetails()
             {
                 ModelName = modelName,
-                Action = routeData.Values["Action"],
-                Controller = routeData.Values["Controller"]
+                ActionName = routeData.Values["Action"],
+                ControllerName = routeData.Values["Controller"]
             };
 
             if (routeData.Values.Count >= 3)
