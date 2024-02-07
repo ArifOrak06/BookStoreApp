@@ -1,4 +1,5 @@
 ﻿using BookStoreApp.Core.Entities;
+using BookStoreApp.Core.Entities.RequestFeatures;
 using BookStoreApp.Core.Repositories;
 using BookStoreApp.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +16,20 @@ namespace BookStoreApp.Persistence.Repositories
         public void CreateOneBook(Book book) => Create(book);
 
         public void DeleteOneBook(Book book) => Delete(book);
-        public async Task<IEnumerable<Book>> GetAllBooksAsync(bool trackChanges) => await GetAll(trackChanges).OrderBy(x => x.Id).ToListAsync();
+        public async Task<PagedList<Book>> GetAllBooksAsync(BookParameters bookParameters, bool trackChanges)
+        {
+            var books = await GetAll(trackChanges)
+            .OrderBy(x => x.Id)
+            .ToListAsync();
+            // sayfalamayı iptal ettik çünkü PagedList içerisinde sayfalama mekanizması tanımladık., sayfalamadan varlıkların tamamını aldık. 
 
+            // hatırlarsanız PagedList içerisinde nesne örneği almamıza yarayacak olan ToPagedList adında bir method yazmıştık, şimdi kullanım sırası geldi.
+
+            return PagedList<Book>.ToPagedList(books, bookParameters.PageNumber,bookParameters.PageSize);
+
+
+
+        }
         public async Task<Book> GetOneBookByIdAsync(int bookId, bool trackChanges) => await GetByFilter(trackChanges, x => x.Id == bookId).SingleOrDefaultAsync();
 
         public void UpdateOneBook(Book book) => Update(book);

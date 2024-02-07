@@ -1,8 +1,10 @@
 ﻿using BookStoreApp.Core.DTOs.Concretes.BookDTOs;
+using BookStoreApp.Core.Entities.RequestFeatures;
 using BookStoreApp.Core.Services;
 using BookStoreApp.WebAPI.ActionFilters;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace BookStoreApp.WebAPI.Controllers
 {
@@ -21,10 +23,16 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBooks()
+        public async Task<IActionResult> GetAllBooks([FromQuery]BookParameters bookParameters)
         {
-            var books = await _serviceManager.BookService.GetAllBooksAsync(false);
-            return Ok(books);
+            var pagedResult = await _serviceManager.BookService.GetAllBooksAsync(bookParameters,false);
+
+            // PagedResult içerisinde bize hem kaynak hemde sayfalandırmaya ilişkin metaData geldiği için metaData'yı Response'umuzun Headers'ına ekleyelim ki API'mizi tüketen
+            // clientlara künye bilgilerini sunarak işlerini kolaylaştıralım, kullanıcı dostu API sunalım.
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData)); // JsonSerializer yapısını System.text üzerinden kullanmanız gerekmektedir.Aksi takdirde kullanıma izin vermeyecek hata dönecektir.
+
+            return Ok(pagedResult.bookDtos); 
         }
 
         [HttpGet("{id:int}")]

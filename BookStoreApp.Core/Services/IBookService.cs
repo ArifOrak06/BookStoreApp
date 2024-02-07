@@ -1,11 +1,12 @@
 ﻿using BookStoreApp.Core.DTOs.Concretes.BookDTOs;
 using BookStoreApp.Core.Entities;
+using BookStoreApp.Core.Entities.RequestFeatures;
 
 namespace BookStoreApp.Core.Services
 {
     public interface IBookService
     {
-        Task<IEnumerable<BookDto>> GetAllBooksAsync(bool trackChanges);
+        Task<(IEnumerable<BookDto> bookDtos, MetaData metaData)> GetAllBooksAsync(BookParameters bookParameters, bool trackChanges);
         Task<BookDto> GetOneBookByIdAsync(int bookId, bool trackChanges);
         Task<BookDto> CreateOneBookAsync(BookDtoForInsertion bookDtoForInsertion);
         Task DeleteOneBookAsync(int bookId,bool trackChanges);

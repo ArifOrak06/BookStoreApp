@@ -1,10 +1,11 @@
 ﻿using BookStoreApp.Core.Entities;
+using BookStoreApp.Core.Entities.RequestFeatures;
 
 namespace BookStoreApp.Core.Repositories
 {
     public interface IBookRepository : IRepositoryBase<Book>
     {
-        Task<IEnumerable<Book>> GetAllBooksAsync(bool trackChanges);
+        Task<PagedList<Book>> GetAllBooksAsync(BookParameters bookParameters, bool trackChanges);
         Task<Book> GetOneBookByIdAsync(int bookId, bool trackChanges);
         void CreateOneBook(Book book);
         void UpdateOneBook(Book book);
