@@ -1,10 +1,12 @@
 ﻿using BookStoreApp.Core.DTOs.Concretes.BookDTOs;
 using BookStoreApp.Core.Services;
+using BookStoreApp.WebAPI.ActionFilters;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreApp.WebAPI.Controllers
 {
+    [ServiceFilter(typeof(LogFilterAttribute))]
     [Route("api/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
@@ -30,7 +32,8 @@ namespace BookStoreApp.WebAPI.Controllers
         {
             return Ok(await _serviceManager.BookService.GetOneBookByIdAsync(id, false));
         }
-
+   
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         [HttpPost]
         public async Task<IActionResult> CreateOneBook([FromBody] BookDtoForInsertion bookDtoForInsertion)
         {
