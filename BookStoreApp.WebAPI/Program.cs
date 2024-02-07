@@ -1,7 +1,9 @@
 using BookStoreApp.Core.Services;
 using BookStoreApp.Persistence.Extensions.Microsoft;
 using BookStoreApp.Service.Extensions.Microsoft;
+using BookStoreApp.WebAPI.ActionFilters;
 using BookStoreApp.WebAPI.Extensions;
+using BookStoreApp.WebAPI.Extensions.Microsoft;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
 
@@ -33,6 +35,10 @@ builder.Services.ConfigurePersistenceRepositories();
 
 //register of Servies Layer Services
 builder.Services.ConfigureServicesForBusinesLayer();
+
+//ActionFilters Registration
+builder.Services.ConfigureActionFilters();
+
 
 // nlog configuration
 LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
