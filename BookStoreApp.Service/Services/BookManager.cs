@@ -81,7 +81,7 @@ namespace BookStoreApp.Service.Services
 
         private async Task<Book> GetOneBookByIdAndCheckExitsAsync (int id, bool trackChanges)
         {
-            var entity = _repositoryManager.BookRepository.GetOneBookByIdAsync(id, trackChanges);
+            var entity =await  _repositoryManager.BookRepository.GetOneBookByIdAsync(id, trackChanges);
             if(entity == null)
                 throw new BookNotFoundException(id);
 
