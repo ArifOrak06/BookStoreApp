@@ -16,5 +16,7 @@
             set { _pageSize = value > maxPageSize ? maxPageSize : value; } // kullanıcı 50 ve üzeri kayıt görmek ister ise  buna izin vermeyip üst limitimiz olan 50 kayıt listeleyeceğiz, ancak 50 limitinden küçük bir değerde kayıt görmek isterse o zaman istediği adette kayıt listeleyeceğiz.
         }
 
+        public String? OrderBy { get; set; }
+
     }
 }

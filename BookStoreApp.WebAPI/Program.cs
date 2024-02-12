@@ -40,6 +40,9 @@ builder.Services.ConfigureServicesForBusinesLayer();
 builder.Services.ConfigureActionFilters();
 
 
+//CORS Config
+builder.Services.ConfigureCors();
+
 // nlog configuration
 LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
@@ -70,6 +73,8 @@ if (app.Environment.IsProduction())
 
 
 app.UseHttpsRedirection();
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 
