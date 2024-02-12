@@ -39,7 +39,9 @@ namespace BookStoreApp.Service.Services
         }
 
         public async Task<(IEnumerable<BookDto> bookDtos, MetaData metaData)> GetAllBooksAsync(BookParameters bookParameters, bool trackChanges)
-        {
+        { 
+            if(!bookParameters.ValidPriceRange)
+                throw new PriceOutOfRangeBadRequestException();
             var booksWithMetaData =  await _repositoryManager.BookRepository.GetAllBooksAsync(bookParameters,trackChanges);
             // daha sonra bir tupple dönmemiz gerektiği için burada da bir hatırlatma yapmamız gerekir, PagedList<Book> içerisinde hem metaData, hemde sayfalandırılmış halde List<Book> dönüyor, dolayısıyla PagedList<Book> yapısını List<Book> olarak düşünebiliriz, zaten pagedList'i hatırlarsanız List<T> koleksiyonundan inherit etmiştik.
             // tuplle içerisinde hem IEnumerable<BookDto> ve hemde MetaData dönmemiz gerektiği için PagedList<Book>'u IEnumerable<BookDto>'ya mapleyelim.
